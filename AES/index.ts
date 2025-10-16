@@ -1,47 +1,52 @@
-// index.ts
 import * as readline from "readline";
-import { AES } from "./aes";
-import { hexToBytes, isHexString, bytesToHex } from "./utils";
+import { hexToByte } from "./utils";
+import { keyExpansion, addRoundKey, subBytes, shiftRows, mixColumns, printStateMatrix } from "./aes";
 
-const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
-
-function question(prompt: string): Promise<string> {
-  return new Promise(resolve => rl.question(prompt, ans => resolve(ans.trim())));
+async function question(prompt: string): Promise<string> {
+  const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+  return new Promise(resolve => rl.question(prompt, ans => { rl.close(); resolve(ans.trim()); }));
 }
 
 (async () => {
   try {
-    const plaintextInput = await question("Enter plaintext (16 chars or 32 HEX): ");
-    const keyInput = await question("Enter key (16 chars or 32 HEX): ");
-    rl.close();
+    const keyInput = await question("Nhap 32 ky tu hex cho AES128 key: ");
+    const stateInput = await question("Nhap 32 ky tu hex cho state ban dau: ");
 
-    let plaintextBytes: Uint8Array;
-    let keyBytes: Uint8Array;
-
-    // Determine plaintext format
-    if (plaintextInput.length === 32 && isHexString(plaintextInput)) {
-      plaintextBytes = hexToBytes(plaintextInput);
-    } else if (plaintextInput.length === 16) {
-      plaintextBytes = new Uint8Array(Buffer.from(plaintextInput, "utf8"));
-    } else {
-      throw new Error("Plaintext must be 16 chars or 32 HEX");
+    if (keyInput.length !== 32 || stateInput.length !== 32) {
+      console.error("Loi: phai nhap dung 32 ky tu hex cho key va state");
+      process.exit(1);
     }
 
-    if (keyInput.length === 32 && isHexString(keyInput)) {
-      keyBytes = hexToBytes(keyInput);
-    } else if (keyInput.length === 16) {
-      keyBytes = new Uint8Array(Buffer.from(keyInput, "utf8"));
-    } else {
-      throw new Error("Key must be 16 chars or 32 HEX");
+    const key = new Array(16).fill(0);
+    const state = new Array(16).fill(0);
+    for (let i = 0; i < 16; i++) {
+      key[i] = hexToByte(keyInput.substr(i*2,2));
+      state[i] = hexToByte(stateInput.substr(i*2,2));
     }
 
-    const aes = new AES(keyBytes);
-    // debug=true prints every step
-    const cipher = aes.encrypt(plaintextBytes, true);
+    const w: number[][] = new Array(44);
+    for (let i = 0; i < 44; i++) w[i] = new Array(4).fill(0);
 
-    console.log("\nFINAL CIPHERTEXT (HEX):", bytesToHex(cipher));
+    keyExpansion(key, w);
+
+    addRoundKey(state, w, 0);
+    printStateMatrix(state, 0);
+
+    for (let round = 1; round <= 9; round++) {
+      subBytes(state);
+      shiftRows(state);
+      mixColumns(state);
+      addRoundKey(state, w, round);
+      printStateMatrix(state, round);
+    }
+
+    subBytes(state);
+    shiftRows(state);
+    addRoundKey(state, w, 10);
+    printStateMatrix(state, 10);
+
   } catch (e) {
-    console.error("Error:", (e as Error).message);
+    console.error("Error:", e);
     process.exit(1);
   }
 })();
