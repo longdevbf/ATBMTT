@@ -13,9 +13,7 @@ string ThapPhanSangNhiPhan(int decimal)
         decimal = decimal / 2;
     }
     while (binary.length() < 4)
-    {
         binary = "0" + binary;
-    }
     return binary;
 }
 
@@ -27,9 +25,7 @@ int NhiPhanSangThapPhan(string binary)
     for (int i = size - 1; i >= 0; i--)
     {
         if (binary[i] == '1')
-        {
             decimal += pow(2, cnt);
-        }
         cnt++;
     }
     return decimal;
@@ -38,28 +34,22 @@ int NhiPhanSangThapPhan(string binary)
 string PhepDichBit(const string &STR, int SoBit)
 {
     string str;
-
     if (STR.empty())
         return str;
 
     if (SoBit == 1)
     {
-        for (int i = 0; i < STR.length() - 1; i++)
-        {
-            str += STR[i + 1];
-        }
+        for (int j = 0; j < (int)STR.length() - 1; j++)
+            str += STR[j + 1];
         str += STR[0];
     }
     else
     {
-        for (int i = 1; i < STR.length() - 1; i++)
-        {
-            str += STR[i + 1];
-        }
+        for (int j = 1; j < (int)STR.length() - 1; j++)
+            str += STR[j + 1];
         str += STR[0];
         str += STR[1];
     }
-
     return str;
 }
 
@@ -68,19 +58,17 @@ string Xor(string a, string b)
 {
     string res = "";
     int size = b.size();
-    for (int i = 0; i < size; i++)
+    for (int j = 0; j < size; j++)
     {
-        if (a[i] != b[i])
-            res += "1";
-        else
-            res += "0";
+        res += (a[j] != b[j]) ? '1' : '0';
     }
     return res;
 }
+
 // Function to generate the 16 keys.
 void SinhKhoa(string key)
 {
-    // PC_1: Lưu lại 56 bit từ 64 bit của khóa ban đầu loại 8 bit parity bit
+    // PC_1
     int pc1[56] = {
         57, 49, 41, 33, 25, 17, 9,
         1, 58, 50, 42, 34, 26, 18,
@@ -90,7 +78,6 @@ void SinhKhoa(string key)
         7, 62, 54, 46, 38, 30, 22,
         14, 6, 61, 53, 45, 37, 29,
         21, 13, 5, 28, 20, 12, 4};
-
     // PC_2
     int pc2[48] = {
         14, 17, 11, 24, 1, 5,
@@ -102,21 +89,18 @@ void SinhKhoa(string key)
         44, 49, 39, 56, 34, 53,
         46, 42, 50, 36, 29, 32};
 
-    // Nén khóa bằng bảng PC_1
+    // Nén khóa bằng PC_1
     string perm_key = "";
-    for (int i = 0; i < 56; i++)
-    {
-        perm_key += key[pc1[i] - 1];
-    }
+    for (int j = 0; j < 56; j++)
+        perm_key += key[pc1[j] - 1];
 
-    // Chia perm_key làm 2 phần
+    // Chia 2 phần
     string C = perm_key.substr(0, 28);
     string D = perm_key.substr(28, 28);
 
-    // Sinh 16 key
+    // Sinh 16 round key
     for (int i = 0; i < 16; i++)
     {
-        // Vị trí 1,2,9,16 dịch 1, còn lại dịch 2
         if (i == 0 || i == 1 || i == 8 || i == 15)
         {
             C = PhepDichBit(C, 1);
@@ -128,15 +112,12 @@ void SinhKhoa(string key)
             D = PhepDichBit(D, 2);
         }
 
-        // Kết hợp C và D
         string combined_key = C + D;
         string round_key = "";
 
-        // Hoán vị key kết hợp bằng bảng vị trí PC_2, lấy 48 bit
+        // Hoán vị bằng PC_2 (48 bit)
         for (int j = 0; j < 48; j++)
-        {
             round_key += combined_key[pc2[j] - 1];
-        }
 
         round_keys[i] = round_key;
     }
@@ -144,7 +125,7 @@ void SinhKhoa(string key)
 
 string DES()
 {
-    // The initial permutation table
+    // IP
     int IP[64] = {
         58, 50, 42, 34, 26, 18, 10, 2,
         60, 52, 44, 36, 28, 20, 12, 4,
@@ -154,7 +135,8 @@ string DES()
         59, 51, 43, 35, 27, 19, 11, 3,
         61, 53, 45, 37, 29, 21, 13, 5,
         63, 55, 47, 39, 31, 23, 15, 7};
-    // The expansion table
+
+    // E
     int E_table[48] = {
         32, 1, 2, 3, 4, 5, 4, 5,
         6, 7, 8, 9, 8, 9, 10, 11,
@@ -162,48 +144,50 @@ string DES()
         16, 17, 18, 19, 20, 21, 20, 21,
         22, 23, 24, 25, 24, 25, 26, 27,
         28, 29, 28, 29, 30, 31, 32, 1};
-    // The substitution boxes. The should contain values
-    // from 0 to 15 in any order.
-    int S_box[8][4][16] =
-        {{14, 4, 13, 1, 2, 15, 11, 8, 3, 10, 6, 12, 5, 9, 0, 7,
-          0, 15, 7, 4, 14, 2, 13, 1, 10, 6, 12, 11, 9, 5, 3, 8,
-          4, 1, 14, 8, 13, 6, 2, 11, 15, 12, 9, 7, 3, 10, 5, 0,
-          15, 12, 8, 2, 4, 9, 1, 7, 5, 11, 3, 14, 10, 0, 6, 13},
-         {15, 1, 8, 14, 6, 11, 3, 4, 9, 7, 2, 13, 12, 0, 5, 10,
-          3, 13, 4, 7, 15, 2, 8, 14, 12, 0, 1, 10, 6, 9, 11, 5,
-          0, 14, 7, 11, 10, 4, 13, 1, 5, 8, 12, 6, 9, 3, 2, 15,
-          13, 8, 10, 1, 3, 15, 4, 2, 11, 6, 7, 12, 0, 5, 14, 9},
-         {10, 0, 9, 14, 6, 3, 15, 5, 1, 13, 12, 7, 11, 4, 2, 8,
-          13, 7, 0, 9, 3, 4, 6, 10, 2, 8, 5, 14, 12, 11, 15, 1,
-          13, 6, 4, 9, 8, 15, 3, 0, 11, 1, 2, 12, 5, 10, 14, 7,
-          1, 10, 13, 0, 6, 9, 8, 7, 4, 15, 14, 3, 11, 5, 2, 12},
-         {7, 13, 14, 3, 0, 6, 9, 10, 1, 2, 8, 5, 11, 12, 4, 15,
-          13, 8, 11, 5, 6, 15, 0, 3, 4, 7, 2, 12, 1, 10, 14, 9,
-          10, 6, 9, 0, 12, 11, 7, 13, 15, 1, 3, 14, 5, 2, 8, 4,
-          3, 15, 0, 6, 10, 1, 13, 8, 9, 4, 5, 11, 12, 7, 2, 14},
-         {2, 12, 4, 1, 7, 10, 11, 6, 8, 5, 3, 15, 13, 0, 14, 9,
-          14, 11, 2, 12, 4, 7, 13, 1, 5, 0, 15, 10, 3, 9, 8, 6,
-          4, 2, 1, 11, 10, 13, 7, 8, 15, 9, 12, 5, 6, 3, 0, 14,
-          11, 8, 12, 7, 1, 14, 2, 13, 6, 15, 0, 9, 10, 4, 5, 3},
-         {12, 1, 10, 15, 9, 2, 6, 8, 0, 13, 3, 4, 14, 7, 5, 11,
-          10, 15, 4, 2, 7, 12, 9, 5, 6, 1, 13, 14, 0, 11, 3, 8,
-          9, 14, 15, 5, 2, 8, 12, 3, 7, 0, 4, 10, 1, 13, 11, 6,
-          4, 3, 2, 12, 9, 5, 15, 10, 11, 14, 1, 7, 6, 0, 8, 13},
-         {4, 11, 2, 14, 15, 0, 8, 13, 3, 12, 9, 7, 5, 10, 6, 1,
-          13, 0, 11, 7, 4, 9, 1, 10, 14, 3, 5, 12, 2, 15, 8, 6,
-          1, 4, 11, 13, 12, 3, 7, 14, 10, 15, 6, 8, 0, 5, 9, 2,
-          6, 11, 13, 8, 1, 4, 10, 7, 9, 5, 0, 15, 14, 2, 3, 12},
-         {13, 2, 8, 4, 6, 15, 11, 1, 10, 9, 3, 14, 5, 0, 12, 7,
-          1, 15, 13, 8, 10, 3, 7, 4, 12, 5, 6, 11, 0, 14, 9, 2,
-          7, 11, 4, 1, 9, 12, 14, 2, 0, 6, 10, 13, 15, 3, 5, 8,
-          2, 1, 14, 7, 4, 10, 8, 13, 15, 12, 9, 0, 3, 5, 6, 11}};
-    // The permutation table
+
+    // S-boxes
+    int S_box[8][4][16] = {
+        {{14, 4, 13, 1, 2, 15, 11, 8, 3, 10, 6, 12, 5, 9, 0, 7},
+         {0, 15, 7, 4, 14, 2, 13, 1, 10, 6, 12, 11, 9, 5, 3, 8},
+         {4, 1, 14, 8, 13, 6, 2, 11, 15, 12, 9, 7, 3, 10, 5, 0},
+         {15, 12, 8, 2, 4, 9, 1, 7, 5, 11, 3, 14, 10, 0, 6, 13}},
+        {{15, 1, 8, 14, 6, 11, 3, 4, 9, 7, 2, 13, 12, 0, 5, 10},
+         {3, 13, 4, 7, 15, 2, 8, 14, 12, 0, 1, 10, 6, 9, 11, 5},
+         {0, 14, 7, 11, 10, 4, 13, 1, 5, 8, 12, 6, 9, 3, 2, 15},
+         {13, 8, 10, 1, 3, 15, 4, 2, 11, 6, 7, 12, 0, 5, 14, 9}},
+        {{10, 0, 9, 14, 6, 3, 15, 5, 1, 13, 12, 7, 11, 4, 2, 8},
+         {13, 7, 0, 9, 3, 4, 6, 10, 2, 8, 5, 14, 12, 11, 15, 1},
+         {13, 6, 4, 9, 8, 15, 3, 0, 11, 1, 2, 12, 5, 10, 14, 7},
+         {1, 10, 13, 0, 6, 9, 8, 7, 4, 15, 14, 3, 11, 5, 2, 12}},
+        {{7, 13, 14, 3, 0, 6, 9, 10, 1, 2, 8, 5, 11, 12, 4, 15},
+         {13, 8, 11, 5, 6, 15, 0, 3, 4, 7, 2, 12, 1, 10, 14, 9},
+         {10, 6, 9, 0, 12, 11, 7, 13, 15, 1, 3, 14, 5, 2, 8, 4},
+         {3, 15, 0, 6, 10, 1, 13, 8, 9, 4, 5, 11, 12, 7, 2, 14}},
+        {{2, 12, 4, 1, 7, 10, 11, 6, 8, 5, 3, 15, 13, 0, 14, 9},
+         {14, 11, 2, 12, 4, 7, 13, 1, 5, 0, 15, 10, 3, 9, 8, 6},
+         {4, 2, 1, 11, 10, 13, 7, 8, 15, 9, 12, 5, 6, 3, 0, 14},
+         {11, 8, 12, 7, 1, 14, 2, 13, 6, 15, 0, 9, 10, 4, 5, 3}},
+        {{12, 1, 10, 15, 9, 2, 6, 8, 0, 13, 3, 4, 14, 7, 5, 11},
+         {10, 15, 4, 2, 7, 12, 9, 5, 6, 1, 13, 14, 0, 11, 3, 8},
+         {9, 14, 15, 5, 2, 8, 12, 3, 7, 0, 4, 10, 1, 13, 11, 6},
+         {4, 3, 2, 12, 9, 5, 15, 10, 11, 14, 1, 7, 6, 0, 8, 13}},
+        {{4, 11, 2, 14, 15, 0, 8, 13, 3, 12, 9, 7, 5, 10, 6, 1},
+         {13, 0, 11, 7, 4, 9, 1, 10, 14, 3, 5, 12, 2, 15, 8, 6},
+         {1, 4, 11, 13, 12, 3, 7, 14, 10, 15, 6, 8, 0, 5, 9, 2},
+         {6, 11, 13, 8, 1, 4, 10, 7, 9, 5, 0, 15, 14, 2, 3, 12}},
+        {{13, 2, 8, 4, 6, 15, 11, 1, 10, 9, 3, 14, 5, 0, 12, 7},
+         {1, 15, 13, 8, 10, 3, 7, 4, 12, 5, 6, 11, 0, 14, 9, 2},
+         {7, 11, 4, 1, 9, 12, 14, 2, 0, 6, 10, 13, 15, 3, 5, 8},
+         {2, 1, 14, 7, 4, 10, 8, 13, 15, 12, 9, 0, 3, 5, 6, 11}}};
+
+    // P
     int P_function[32] = {
         16, 7, 20, 21, 29, 12, 28, 17,
         1, 15, 23, 26, 5, 18, 31, 10,
         2, 8, 24, 14, 32, 27, 3, 9,
         19, 13, 30, 6, 22, 11, 4, 25};
-    // The inverse permutation table (IP^-1)
+
+    // IP^-1
     int IP_1[64] = {
         40, 8, 48, 16, 56, 24, 64, 32,
         39, 7, 47, 15, 55, 23, 63, 31,
@@ -213,49 +197,47 @@ string DES()
         35, 3, 43, 11, 51, 19, 59, 27,
         34, 2, 42, 10, 50, 18, 58, 26,
         33, 1, 41, 9, 49, 17, 57, 25};
-    // 1. Applying the initial permutation
+
+    // 1) IP
     string perm = "";
-    for (int i = 0; i < 64; i++)
-    {
-        perm += plainText[IP[i] - 1];
-    }
-    // Chia thành 2 nửa trái phải
+    for (int j = 0; j < 64; j++)
+        perm += plainText[IP[j] - 1];
+
+    // 2) Chia L/R
     string L = perm.substr(0, 32);
     string R = perm.substr(32, 32);
-    // plain text qua 16 vòng feistel
+
+    // 3) 16 vòng Feistel
     for (int i = 0; i < 16; i++)
     {
         string R_expanded = "";
-        // Mở rộng nửa phải của plain text
-        for (int i = 0; i < 48; i++)
-        {
-            R_expanded += R[E_table[i] - 1];
-        }; // Kết quả đem xor với key
+        // 3.1) Mở rộng R
+        for (int j = 0; j < 48; j++)
+            R_expanded += R[E_table[j] - 1];
+
+        // 3.2) XOR với round key
         string xored = Xor(round_keys[i], R_expanded);
+
+        // 3.3) Qua 8 S-box (mỗi khối 6 bit -> 4 bit)
         string res = "";
-        // Kết quả được chia thành 8 phần bằng nhau và được truyền qua 8 hộp thay thế
-        // sau khi truyền qua hộp thay thế, mỗi hộp được giảm từ 6 xuống còn 4 bit
-        for (int i = 0; i < 8; i++)
+        for (int j = 0; j < 8; j++)
         {
-            // Finding row and column indices to lookup the
-            // substituition box
-            string row1 = xored.substr(i * 6, 1) + xored.substr(i * 6 + 5, 1);
+            string row1 = xored.substr(j * 6, 1) + xored.substr(j * 6 + 5, 1);
             int row = NhiPhanSangThapPhan(row1);
-            string col1 = xored.substr(i * 6 + 1, 1) + xored.substr(i * 6 + 2, 1) + xored.substr(i * 6 + 3, 1) + xored.substr(i * 6 + 4, 1);
-            ;
+            string col1 = xored.substr(j * 6 + 1, 1) + xored.substr(j * 6 + 2, 1) +
+                          xored.substr(j * 6 + 3, 1) + xored.substr(j * 6 + 4, 1);
             int col = NhiPhanSangThapPhan(col1);
-            int val = S_box[i][row][col];
+            int val = S_box[j][row][col];
             res += ThapPhanSangNhiPhan(val);
         }
-        // 3.5. Another permutation is applied
+
+        // 3.5) Hoán vị P
         string perm2 = "";
-        for (int i = 0; i < 32; i++)
-        {
-            perm2 += res[P_function[i] - 1];
-        }
-        // Kết quả xor với nửa trái
+        for (int j = 0; j < 32; j++)
+            perm2 += res[P_function[j] - 1];
+
+        // 3.6) XOR với L và hoán đổi
         xored = Xor(perm2, L);
-        // swap nửa trái và phải
         L = xored;
         if (i < 15)
         {
@@ -264,15 +246,16 @@ string DES()
             L = temp;
         }
     }
+
+    // 4) Ghép và IP^-1
     string combined_text = L + R;
     string ciphertext = "";
-    // IP^-1
-    for (int i = 0; i < 64; i++)
-    {
-        ciphertext += combined_text[IP_1[i] - 1];
-    }
+    for (int j = 0; j < 64; j++)
+        ciphertext += combined_text[IP_1[j] - 1];
+
     return ciphertext;
 }
+
 int main()
 {
     string key = "1010101010111011000010010001100000100111001101101100110011011101";
