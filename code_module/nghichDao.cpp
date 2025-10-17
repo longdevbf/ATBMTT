@@ -3,7 +3,7 @@ using namespace std;
 
 long long nghichdao(long long a, long long n)
 {
-    long long z = n;    // Biến z dùng để lưu giá trị ban đầu của n, dùng trong trường hợp kết quả ra số âm
+    long long z = n;    //  Biến z dùng để lưu giá trị ban đầu của n, dùng trong trường hợp kết quả ra số âm
     // 2 biến tạm dùng để dịch x1-2, y1-2 trong quá trình tính toán
     long long tmpx;
     long long tmpy; 

@@ -1,6 +1,6 @@
 #include <bits/stdc++.h>
 using namespace std;
-
+ //a
 long long bpvn(long long a, long long m, long long n) {
     a %= n;
 

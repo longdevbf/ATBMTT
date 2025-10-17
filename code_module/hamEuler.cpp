@@ -1,6 +1,6 @@
 #include<bits/stdc++.h>
 using namespace std;
-
+//e
 long long Ham_Euler(long long n)
 {
     long long kq = n;

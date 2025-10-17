@@ -1,7 +1,7 @@
 #include<bits/stdc++.h>
 using namespace std;
 
-// tinh module nghich dao
+// tinh module nghich daoo
 long long nghichdao(long long a, long long n)
 {
     long long z = n;

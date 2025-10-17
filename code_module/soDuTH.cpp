@@ -1,7 +1,7 @@
 #include<bits/stdc++.h>
 using namespace std;
 
-// Ham phan tich ra cac thua so nguyen to
+//  Ham phan tich ra cac thua so nguyen to
 vector<long long> pttsnt(long long n)
 {
     vector<long long> thuaso;
