@@ -1,14 +1,10 @@
-// Including dependancies
-#include <iostream>
-#include <string>
-#include <cmath>
+#include <bits/stdc++.h>
 using namespace std;
-// Array to hold 16 keys
+
 string round_keys[16];
-// String to hold the plain text
-string pt;
-// Function to convert a number in decimal to binary
-string convertDecimalToBinary(int decimal)
+string plainText;
+
+string ThapPhanSangNhiPhan(int decimal)
 {
     string binary;
     while (decimal != 0)
@@ -22,71 +18,69 @@ string convertDecimalToBinary(int decimal)
     }
     return binary;
 }
-// Function to convert a number in binary to decimal
-int convertBinaryToDecimal(string binary)
+
+int NhiPhanSangThapPhan(string binary)
 {
     int decimal = 0;
-    int counter = 0;
+    int cnt = 0;
     int size = binary.length();
     for (int i = size - 1; i >= 0; i--)
     {
         if (binary[i] == '1')
         {
-            decimal += pow(2, counter);
+            decimal += pow(2, cnt);
         }
-        counter++;
+        cnt++;
     }
     return decimal;
 }
-// Function to do a circular left shift by 1
-string shift_left_once(string key_chunk)
+
+string PhepDichBit(const string &STR, int SoBit)
 {
-    string shifted = "";
-    for (int i = 1; i < 28; i++)
+    string str;
+
+    if (STR.empty())
+        return str;
+
+    if (SoBit == 1)
     {
-        shifted += key_chunk[i];
-    }
-    shifted += key_chunk[0];
-    return shifted;
-}
-// Function to do a circular left shift by 2
-string shift_left_twice(string key_chunk)
-{
-    string shifted = "";
-    for (int i = 0; i < 2; i++)
-    {
-        for (int j = 1; j < 28; j++)
+        for (int i = 0; i < STR.length() - 1; i++)
         {
-            shifted += key_chunk[j];
+            str += STR[i + 1];
         }
-        shifted += key_chunk[0];
-        key_chunk = shifted;
-        shifted = "";
+        str += STR[0];
     }
-    return key_chunk;
+    else
+    {
+        for (int i = 1; i < STR.length() - 1; i++)
+        {
+            str += STR[i + 1];
+        }
+        str += STR[0];
+        str += STR[1];
+    }
+
+    return str;
 }
-// Function to compute xor between two strings
+
+// Xor bit
 string Xor(string a, string b)
 {
-    string result = "";
+    string res = "";
     int size = b.size();
     for (int i = 0; i < size; i++)
     {
         if (a[i] != b[i])
-        {
-            result += "1";
-        }
+            res += "1";
         else
-        {
-            result += "0";
-        }
+            res += "0";
     }
-    return result;
+    return res;
 }
 // Function to generate the 16 keys.
-void generate_keys(string key)
+void SinhKhoa(string key)
 {
-    // The PC1 table
+    // PC_1: Lưu lại 56 bit từ 64 bit của khóa ban đầu loại 8 bit parity bit
     int pc1[56] = {
         57, 49, 41, 33, 25, 17, 9,
         1, 58, 50, 42, 34, 26, 18,
@@ -96,7 +90,8 @@ void generate_keys(string key)
         7, 62, 54, 46, 38, 30, 22,
         14, 6, 61, 53, 45, 37, 29,
         21, 13, 5, 28, 20, 12, 4};
-    // The PC2 table
+
+    // PC_2
     int pc2[48] = {
         14, 17, 11, 24, 1, 5,
         3, 28, 15, 6, 21, 10,
@@ -106,47 +101,51 @@ void generate_keys(string key)
         30, 40, 51, 45, 33, 48,
         44, 49, 39, 56, 34, 53,
         46, 42, 50, 36, 29, 32};
-    // 1. Compressing the key using the PC1 table
+
+    // Nén khóa bằng bảng PC_1
     string perm_key = "";
     for (int i = 0; i < 56; i++)
     {
         perm_key += key[pc1[i] - 1];
     }
-    // 2. Dividing the key into two equal halves
-    string left = perm_key.substr(0, 28);
-    string right = perm_key.substr(28, 28);
+
+    // Chia perm_key làm 2 phần
+    string C = perm_key.substr(0, 28);
+    string D = perm_key.substr(28, 28);
+
+    // Sinh 16 key
     for (int i = 0; i < 16; i++)
     {
-        // 3.1. For rounds 1, 2, 9, 16 the key_chunks
-        // are shifted by one.
+        // Vị trí 1,2,9,16 dịch 1, còn lại dịch 2
         if (i == 0 || i == 1 || i == 8 || i == 15)
         {
-            left = shift_left_once(left);
-            right = shift_left_once(right);
+            C = PhepDichBit(C, 1);
+            D = PhepDichBit(D, 1);
         }
-        // 3.2. For other rounds, the key_chunks
-        // are shifted by two
         else
         {
-            left = shift_left_twice(left);
-            right = shift_left_twice(right);
+            C = PhepDichBit(C, 2);
+            D = PhepDichBit(D, 2);
         }
-        // Combining the two chunks
-        string combined_key = left + right;
+
+        // Kết hợp C và D
+        string combined_key = C + D;
         string round_key = "";
-        // Finally, using the PC2 table to transpose the key bits
-        for (int i = 0; i < 48; i++)
+
+        // Hoán vị key kết hợp bằng bảng vị trí PC_2, lấy 48 bit
+        for (int j = 0; j < 48; j++)
         {
-            round_key += combined_key[pc2[i] - 1];
+            round_key += combined_key[pc2[j] - 1];
         }
+
         round_keys[i] = round_key;
     }
 }
-// Implementing the algorithm
+
 string DES()
 {
     // The initial permutation table
-    int initial_permutation[64] = {
+    int IP[64] = {
         58, 50, 42, 34, 26, 18, 10, 2,
         60, 52, 44, 36, 28, 20, 12, 4,
         62, 54, 46, 38, 30, 22, 14, 6,
@@ -156,7 +155,7 @@ string DES()
         61, 53, 45, 37, 29, 21, 13, 5,
         63, 55, 47, 39, 31, 23, 15, 7};
     // The expansion table
-    int expansion_table[48] = {
+    int E_table[48] = {
         32, 1, 2, 3, 4, 5, 4, 5,
         6, 7, 8, 9, 8, 9, 10, 11,
         12, 13, 12, 13, 14, 15, 16, 17,
@@ -165,7 +164,7 @@ string DES()
         28, 29, 28, 29, 30, 31, 32, 1};
     // The substitution boxes. The should contain values
     // from 0 to 15 in any order.
-    int substition_boxes[8][4][16] =
+    int S_box[8][4][16] =
         {{14, 4, 13, 1, 2, 15, 11, 8, 3, 10, 6, 12, 5, 9, 0, 7,
           0, 15, 7, 4, 14, 2, 13, 1, 10, 6, 12, 11, 9, 5, 3, 8,
           4, 1, 14, 8, 13, 6, 2, 11, 15, 12, 9, 7, 3, 10, 5, 0,
@@ -199,13 +198,13 @@ string DES()
           7, 11, 4, 1, 9, 12, 14, 2, 0, 6, 10, 13, 15, 3, 5, 8,
           2, 1, 14, 7, 4, 10, 8, 13, 15, 12, 9, 0, 3, 5, 6, 11}};
     // The permutation table
-    int permutation_tab[32] = {
+    int P_function[32] = {
         16, 7, 20, 21, 29, 12, 28, 17,
         1, 15, 23, 26, 5, 18, 31, 10,
         2, 8, 24, 14, 32, 27, 3, 9,
         19, 13, 30, 6, 22, 11, 4, 25};
-    // The inverse permutation table
-    int inverse_permutation[64] = {
+    // The inverse permutation table (IP^-1)
+    int IP_1[64] = {
         40, 8, 48, 16, 56, 24, 64, 32,
         39, 7, 47, 15, 55, 23, 63, 31,
         38, 6, 46, 14, 54, 22, 62, 30,
@@ -218,75 +217,68 @@ string DES()
     string perm = "";
     for (int i = 0; i < 64; i++)
     {
-        perm += pt[initial_permutation[i] - 1];
+        perm += plainText[IP[i] - 1];
     }
-    // 2. Dividing the result into two equal halves
-    string left = perm.substr(0, 32);
-    string right = perm.substr(32, 32);
-    // The plain text is encrypted 16 times
+    // Chia thành 2 nửa trái phải
+    string L = perm.substr(0, 32);
+    string R = perm.substr(32, 32);
+    // plain text qua 16 vòng feistel
     for (int i = 0; i < 16; i++)
     {
-        string right_expanded = "";
-        // 3.1. The right half of the plain text is expanded
+        string R_expanded = "";
+        // Mở rộng nửa phải của plain text
         for (int i = 0; i < 48; i++)
         {
-            right_expanded += right[expansion_table[i] - 1];
-        }; // 3.3. The result is xored with a key
-        string xored = Xor(round_keys[i], right_expanded);
+            R_expanded += R[E_table[i] - 1];
+        }; // Kết quả đem xor với key
+        string xored = Xor(round_keys[i], R_expanded);
         string res = "";
-        // 3.4. The result is divided into 8 equal parts and passed
-        // through 8 substitution boxes. After passing through a
-        // substituion box, each box is reduces from 6 to 4 bits.
+        // Kết quả được chia thành 8 phần bằng nhau và được truyền qua 8 hộp thay thế
+        // sau khi truyền qua hộp thay thế, mỗi hộp được giảm từ 6 xuống còn 4 bit
         for (int i = 0; i < 8; i++)
         {
             // Finding row and column indices to lookup the
             // substituition box
             string row1 = xored.substr(i * 6, 1) + xored.substr(i * 6 + 5, 1);
-            int row = convertBinaryToDecimal(row1);
+            int row = NhiPhanSangThapPhan(row1);
             string col1 = xored.substr(i * 6 + 1, 1) + xored.substr(i * 6 + 2, 1) + xored.substr(i * 6 + 3, 1) + xored.substr(i * 6 + 4, 1);
             ;
-            int col = convertBinaryToDecimal(col1);
-            int val = substition_boxes[i][row][col];
-            res += convertDecimalToBinary(val);
+            int col = NhiPhanSangThapPhan(col1);
+            int val = S_box[i][row][col];
+            res += ThapPhanSangNhiPhan(val);
         }
         // 3.5. Another permutation is applied
         string perm2 = "";
         for (int i = 0; i < 32; i++)
         {
-            perm2 += res[permutation_tab[i] - 1];
+            perm2 += res[P_function[i] - 1];
         }
-        // 3.6. The result is xored with the left half
-        xored = Xor(perm2, left);
-        // 3.7. The left and the right parts of the plain text are swapped
-        left = xored;
+        // Kết quả xor với nửa trái
+        xored = Xor(perm2, L);
+        // swap nửa trái và phải
+        L = xored;
         if (i < 15)
         {
-            string temp = right;
-            right = xored;
-            left = temp;
+            string temp = R;
+            R = xored;
+            L = temp;
         }
     }
-    // 4. The halves of the plain text are applied
-    string combined_text = left + right;
+    string combined_text = L + R;
     string ciphertext = "";
-    // The inverse of the initial permuttaion is applied
+    // IP^-1
     for (int i = 0; i < 64; i++)
     {
-        ciphertext += combined_text[inverse_permutation[i] - 1];
+        ciphertext += combined_text[IP_1[i] - 1];
     }
-    // And we finally get the cipher text
     return ciphertext;
 }
 int main()
 {
-    // A 64 bit key
     string key = "1010101010111011000010010001100000100111001101101100110011011101";
-    // A block of plain text of 64 bits
-    pt = "1010101111001101111001101010101111001101000100110010010100110110";
-    // Calling the function to generate 16 keys
-    generate_keys(key);
-    cout << "Plain text: " << pt << endl;
-    // Applying the algo
+    plainText = "1010101111001101111001101010101111001101000100110010010100110110";
+    SinhKhoa(key);
+    cout << "Plain text: " << plainText << endl;
     string ct = DES();
     cout << "Ciphertext: " << ct << endl;
 }
