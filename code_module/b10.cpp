@@ -1,7 +1,7 @@
 #include <bits/stdc++.h>
 using namespace std;
 using int64 = long long;
-
+//a
 static int64 pow_mod(int64 a, long long b, int64 m) {
     a %= m;                    
     int64 res = 1 % m;

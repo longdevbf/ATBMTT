@@ -1,7 +1,7 @@
 #include<bits/stdc++.h>
 using namespace std;
 
-// tinh binh phuong va nhan
+//  tinh binh phuong va nhan
 long long bpvn(long long a, long long m, long long n)
 {
     a %= n;

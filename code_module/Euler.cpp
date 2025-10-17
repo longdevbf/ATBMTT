@@ -1,7 +1,7 @@
 #include<bits/stdc++.h>
 using namespace std;
 
-// tinh Ham Euler
+//  tinh Ham Euler
 long long Ham_Euler(long long n)
 {
     long long kq = n;
