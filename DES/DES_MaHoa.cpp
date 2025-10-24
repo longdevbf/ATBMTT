@@ -273,6 +273,29 @@ string DES()
     }
     return ciphertext;
 }
+string BinaryToHex(string binary)
+{
+    string hex = "";
+    // Đảm bảo độ dài binary chia hết cho 4
+    while (binary.length() % 4 != 0)
+    {
+        binary = "0" + binary;
+    }
+    
+    // Chuyển từng nhóm 4 bit thành 1 ký tự hex
+    for (int i = 0; i < binary.length(); i += 4)
+    {
+        string fourBits = binary.substr(i, 4);
+        int decimal = NhiPhanSangThapPhan(fourBits);
+        
+        if (decimal < 10)
+            hex += char('0' + decimal);
+        else
+            hex += char('A' + decimal - 10);
+    }
+    
+    return hex;
+}
 int main()
 {
     string key = "1010101010111011000010010001100000100111001101101100110011011101";
@@ -280,5 +303,6 @@ int main()
     SinhKhoa(key);
     cout << "Plain text: " << plainText << endl;
     string ct = DES();
-    cout << "Ciphertext: " << ct << endl;
+    cout << "Ciphertext: " << BinaryToHex(ct)<< endl;
+    
 }
