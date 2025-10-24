@@ -33,3 +33,14 @@ export function mul02(x: Byte): Byte {
 export function mul03(x: Byte): Byte {
   return (mul02(x) ^ x) & 0xFF;
 }
+export function hexStringToBytes(hexStr: string): Byte[] {
+  const bytes: Byte[] = [];
+  for (let i = 0; i < hexStr.length; i += 2) {
+    bytes.push(hexToByte(hexStr.substr(i, 2)));
+  }
+  return bytes;
+}
+
+export function bytesToHexString(bytes: Byte[]): string {
+  return bytes.map(b => b.toString(16).padStart(2, '0').toUpperCase()).join('');
+}
