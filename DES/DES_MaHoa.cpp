@@ -4,6 +4,28 @@ using namespace std;
 string round_keys[16];
 string plainText;
 
+string NhiPhanSangHex(const string &binary)
+{
+    if (binary.empty())
+        return "";
+    // Bản sao để padding
+    string s = binary;
+    // Đệm trái cho đủ bội số của 4
+    int rem = (int)s.size() % 4;
+    if (rem)
+        s = string(4 - rem, '0') + s;
+    static const char HEXLUT[] = "0123456789ABCDEF";
+    string hex;
+    hex.reserve(s.size() / 4);
+    for (size_t i = 0; i < s.size(); i += 4)
+    {
+        // Quy đổi 4 bit -> 1 số 0..15
+        int val = (s[i] - '0') * 8 + (s[i + 1] - '0') * 4 + (s[i + 2] - '0') * 2 + (s[i + 3] - '0');
+        hex.push_back(HEXLUT[val]);
+    }
+    return hex;
+}
+
 string ThapPhanSangNhiPhan(int decimal)
 {
     string binary;
@@ -202,7 +224,7 @@ string DES()
     string perm = "";
     for (int j = 0; j < 64; j++)
         perm += plainText[IP[j] - 1];
-
+    cout << "Sau IP: " << perm;
     // 2) Chia L/R
     string L = perm.substr(0, 32);
     string R = perm.substr(32, 32);
@@ -253,7 +275,9 @@ string DES()
     for (int j = 0; j < 64; j++)
         ciphertext += combined_text[IP_1[j] - 1];
 
-    return ciphertext;
+    string ciphertext_Hex = NhiPhanSangHex(ciphertext);
+
+    return ciphertext_Hex;
 }
 
 int main()

@@ -31,10 +31,8 @@ string PhepDichBit(const string &STR, int SoBit)
   return str;
 }
 
-void SinhKhoa(string key)
-{
-  // PC_1: Lưu lại 56 bit từ 64 bit của khóa ban đầu loại 8 bit parity bit
-  int pc1[56] = {
+string PC_1(string key) {
+    int pc1[56] = {
       57, 49, 41, 33, 25, 17, 9,
       1, 58, 50, 42, 34, 26, 18,
       10, 2, 59, 51, 43, 35, 27,
@@ -43,7 +41,16 @@ void SinhKhoa(string key)
       7, 62, 54, 46, 38, 30, 22,
       14, 6, 61, 53, 45, 37, 29,
       21, 13, 5, 28, 20, 12, 4};
+    string perm_key = "";
+    for (int i = 0; i < 56; i++)
+    {
+      perm_key += key[pc1[i] - 1];
+    }
+    return perm_key;
+}
 
+void SinhKhoa(string key)
+{
   // PC_2
   int pc2[48] = {
       14, 17, 11, 24, 1, 5,
@@ -56,11 +63,7 @@ void SinhKhoa(string key)
       46, 42, 50, 36, 29, 32};
 
   // Nén khóa bằng bảng PC_1
-  string perm_key = "";
-  for (int i = 0; i < 56; i++)
-  {
-    perm_key += key[pc1[i] - 1];
-  }
+  string perm_key = PC_1(key);
 
   // Chia perm_key làm 2 phần
   string C = perm_key.substr(0, 28);
@@ -101,6 +104,6 @@ int main()
   string key =
       "10101010101110110000100100011000001001110011"
       "01101100110011011101";
-
+  
   SinhKhoa(key);
 }
