@@ -27,13 +27,26 @@ def main():
     # a: int = int(input("Nhập số nguyên a: "))
     # xA: int = int(input("Nhập số khóa riêng của A: "))
     # xB: int = int(input("Nhập số khóa riêng của B: "))
-    yA: int = public_key(17, 3, 5)
-    # yB: int = public_key(q, a, xB)
-    print(f"Khóa công khai của A: {yA}")
+    # yA: int = public_key(437, 7, 177)
+    # yB: int = public_key(q, b, xB)
+    # print(f"Khóa công khai của A: {yA}")
     # print(f"Khóa công khai của B: {yB}")
-    sA: int = shared_secret(17, 3, 6)
+    # sA: int = shared_secret(37, 4, 5)
     # sB: int = shared_secret(q, yA, xB)
-    print(f"Khóa phiên của A: {sA}")
+    # print(f"Khóa phiên của A: {sA}")
     # print(f"Khóa phiên của B: {sB}")
+    q = 6199
+    a = 3
+    xA = 531
+    xB =540
+    #a. Cách An tính ra khóa công khai của An và khóa phiên 
+    yA = public_key(q, a, xA)
+    yB = public_key(q, a, xB)
+    print("Khóa công khai của An:", yA)
+    print("Khóa công khai của Binh:", yB)
+    sA = shared_secret(q, yB, xA)
+    sB = shared_secret(q, yA, xB)
+    print("Khóa phiên của An:", sA)
+    print("Khóa phiên của Binh:", sB)
 if __name__ == "__main__":
     main()

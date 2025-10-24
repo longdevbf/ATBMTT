@@ -33,6 +33,6 @@ long long nghichdao(long long a, long long n)
 
 int main()
 {
-    long long a = 393, n = 443;
+    long long a = 25, n = 31;
     cout << "Ket qua: " << nghichdao(a,n);
 }

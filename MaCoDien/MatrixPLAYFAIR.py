@@ -55,7 +55,6 @@ def main():
         print(' '.join(row))
     M = M.replace(" ", "").replace("J", "I")
     K = K.replace(" ", "").replace("J", "I")
-    
     pairs = []
     i = 0
     while i < len(M):

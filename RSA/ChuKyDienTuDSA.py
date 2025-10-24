@@ -1,10 +1,14 @@
 def main():
-    p:int=int(input("Nhập số nguyên tố p: "))
-    q:int=int(input("Nhập số nguyên tố q: "))
-    h:int= int(input("Nhập giá trị băm h: "))
+    # p:int=int(input("Nhập số nguyên tố p: "))
+    # q:int=int(input("Nhập số nguyên tố q: "))
+    # h:int= int(input("Nhập giá trị băm h: "))
+    p:int = 89
+    q = 11
+    h = 38
     g = pow(h, (p-1)//q, p)
     HM:int = int(input("Nhập giá trị băm HM: "))
-    xA:int=int(input("Nhập khóa riêng xA: "))
+    # xA:int=int(input("Nhập khóa riêng xA: "))
+    xA = 5
     yA = public_key(xA, p, g)
     print("Khóa công khai yA:", yA)
     chu_ky_value = chu_ky(g, p, q, HM, xA)
@@ -39,7 +43,9 @@ def chu_ky(g, p, q, h, xA) -> tuple:
     Returns:
         Chữ ký số (r, s)
     """
-    k = int(input("Nhập số nguyên k: "))
+    print("Tạo chữ ký số...")
+    #k = int(input("Nhập số nguyên k: "))
+    k= 2
     if k in k_used:
         print("Lỗi: k đã được sử dụng trước đó. Vui lòng chọn k khác.")
         return
@@ -53,6 +59,19 @@ def chu_ky(g, p, q, h, xA) -> tuple:
 
 
 def xac_minh(signature:tuple, q, p, h, g, yA) -> bool:
+    """
+    Xác minh chữ ký số
+    Args:
+        signature: Chữ ký số (r, s)
+        q: Số nguyên tố
+        p: Số nguyên tố
+        h: Giá trị băm
+        g: Cơ số
+        yA: Khóa công khai
+    Returns:
+        True nếu chữ ký hợp lệ, False nếu không hợp lệ
+    """
+
     print("Xác minh chữ ký...")
     r,s = signature
     w = pow(s, q-2, q)
@@ -64,5 +83,7 @@ def xac_minh(signature:tuple, q, p, h, g, yA) -> bool:
     v = ((pow(g, u1, p) * pow(yA, u2, p)) % p) % q
     print(f"v = (({g}^{u1} * yA^{u2}) mod {p}) mod {q}:", v)
     return v == r
+
+
 if __name__ == "__main__":
     main()
