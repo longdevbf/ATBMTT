@@ -25,7 +25,7 @@ def private_key(d: int, p: int, q: int) -> tuple:
     Returns:
         Khóa riêng (d, n)
     """
-    return (d, p * q)
+    return (d, p ,q)
 
 def encrypt(message: int, public_key: tuple) -> int:
     """

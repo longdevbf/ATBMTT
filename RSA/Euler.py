@@ -15,7 +15,7 @@ def euler_phi_basic(n):
     Phương pháp cơ bản: kiểm tra từng số từ 1 đến n-1
     
     Args:
-        n: Số nguyên dương
+        n: Số nguyên dươn
     
     Returns:
         Số lượng các số nguyên tố cùng nhau với n
